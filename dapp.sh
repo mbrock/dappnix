@@ -3,8 +3,8 @@ unpackPhase
 
 jsonopts=--combined-json=abi,bin,bin-runtime,srcmap,srcmap-runtime,ast
 
-DAPP_SRC=$src/src
-DAPP_OUT=out
+export DAPP_SRC=$src/src
+export DAPP_OUT=out
 
 find "$DAPP_SRC" -name '*.sol' | while read -r x; do
   dir=${x%\/*}
@@ -15,6 +15,11 @@ find "$DAPP_SRC" -name '*.sol' | while read -r x; do
   json_file=$DAPP_OUT/$dir/${x##*/}.json
   (set -x; solc $REMAPPINGS $jsonopts = "$x" >"$json_file")
 done
+
+mkdir lib
+echo "$LIBSCRIPT" > setup.sh
+source setup.sh
+dapp test-hevm
 
 mkdir -p $out/{src,lib,out}
 cp -r $src/src $out
